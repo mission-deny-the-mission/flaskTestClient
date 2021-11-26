@@ -11,6 +11,12 @@ response = requests.post("http://{0}/upload/{1}/example.md".format(address, dir)
 if response.status_code == 201:
     response = requests.get("http://{0}/compile/{1}/example.md".format(address, dir))
     file = open("example.html", "w")
-    print(response.text)
     file.write(response.text)
+    file.close()
+
+    response = requests.get("http://{0}/compilepdf/{1}/example.md".format(address, dir))
+    file = open("example.pdf", "wb")
+    for chunk in response.iter_content(chunk_size=1024):
+        if chunk:
+            file.write(chunk)
     file.close()
