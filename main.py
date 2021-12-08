@@ -4,9 +4,9 @@ addressfile = open("server.url", 'r')
 address = addressfile.read().strip()
 addressfile.close()
 
-def upload_file(dir, filename):
+def upload_file(workspace, filename):
     file = open(filename, 'rb')
-    response = requests.post("http://{0}/upload/{1}/{2}".format(address, dir, filename), data=file)
+    response = requests.post("http://{0}/upload/{1}/{2}".format(address, workspace, filename), data=file)
     if response.status_code not in [201, 200]:
         raise Exception("bad status code: {0}".format(response.status_code))
 
@@ -32,21 +32,34 @@ def compile_file(function, workspace, input_filename, output_filename):
         raise Exception("Bad response code: {0}".format(response.status_code))
 
 def compile_md_files():
+    print("Creating workspace")
     workspace = make_workspace()
+    print("Uploading file")
     upload_file(workspace, "example.md")
 
+    print("Compile HTML")
     compile_file("CompileMDtoHTML", workspace, "example.md", "example.html")
+    print("Compile PDF")
     compile_file("CompileMDtoPDF", workspace, "example.md", "example.pdf")
 
+    print("Delete workspace")
     delete_workspace(workspace)
 
 def compile_latex_files():
+    print("Create workspace")
     workspace = make_workspace()
+    print("Upload files")
     for filename in ["report.bib", "report.tex", "FPGA insides 1.png"]:
+        print("Uploading file:", filename)
         upload_file(workspace, filename)
+    print("Compile LaTeX to PDF")
     compile_file("CompileLaTeXtoPDF", workspace, "report.tex", "report.pdf")
+    print("Delete workspace")
     delete_workspace(workspace)
 
 if __name__ == "__main__":
+    print("Markdown compilation:")
     compile_md_files()
+    print("LaTeX compilation:")
     compile_latex_files()
+    print("All done")
