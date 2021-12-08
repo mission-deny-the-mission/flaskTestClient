@@ -69,6 +69,10 @@ def compile_latex_files():
         print("{:<30}{:<20}".format(file_size_and_name["name"], file_size_and_name["size"]))
     print("-" * 50, "\n")
 
+    response = requests.get("http://{0}/ListFiles/{1}/abcd".format(address, workspace))
+    if response.status_code == 401:
+        print("Authentication test succeeded")
+
     print("Delete workspace")
     delete_workspace(workspace)
 
