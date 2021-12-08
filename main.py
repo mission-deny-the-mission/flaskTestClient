@@ -31,6 +31,13 @@ def compile_file(function, workspace, input_filename, output_filename):
     else:
         raise Exception("Bad response code: {0}".format(response.status_code))
 
+def list_dirs(dir):
+    response = requests.get("http://{0}/ListFiles/{1}".format(address, dir))
+    if response.status_code in [200, 201]:
+        return response.text
+    else:
+        raise Exception("Bad response code: {0}".format(response.status_code))
+
 def compile_md_files():
     print("Creating workspace")
     workspace = make_workspace()
@@ -54,8 +61,12 @@ def compile_latex_files():
         upload_file(workspace, filename)
     print("Compile LaTeX to PDF")
     compile_file("CompileLaTeXtoPDF", workspace, "report.tex", "report.pdf")
+    print("Files in workspace")
+    print(list_dirs(workspace))
     print("Delete workspace")
     delete_workspace(workspace)
+
+
 
 if __name__ == "__main__":
     print("Markdown compilation:")
