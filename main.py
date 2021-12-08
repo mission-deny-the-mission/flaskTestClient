@@ -1,4 +1,5 @@
 import requests
+import json
 
 addressfile = open("server.url", 'r')
 address = addressfile.read().strip()
@@ -34,7 +35,7 @@ def compile_file(function, workspace, input_filename, output_filename):
 def list_dirs(dir):
     response = requests.get("http://{0}/ListFiles/{1}".format(address, dir))
     if response.status_code in [200, 201]:
-        return response.text
+        return json.loads(response.text)
     else:
         raise Exception("Bad response code: {0}".format(response.status_code))
 
@@ -61,8 +62,12 @@ def compile_latex_files():
         upload_file(workspace, filename)
     print("Compile LaTeX to PDF")
     compile_file("CompileLaTeXtoPDF", workspace, "report.tex", "report.pdf")
-    print("Files in workspace")
-    print(list_dirs(workspace))
+
+    print("Files in workspace:")
+    print("{:<30}{:<20}".format("File name:", "File size (bytes)"))
+    for file_size_and_name in list_dirs(workspace):
+        print("{:<30}{:<20}".format(file_size_and_name["name"], file_size_and_name["size"]))
+
     print("Delete workspace")
     delete_workspace(workspace)
 
