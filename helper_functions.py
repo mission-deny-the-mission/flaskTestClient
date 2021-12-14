@@ -52,6 +52,15 @@ def list_dirs(dir, password):
     else:
         raise Exception("Bad response code: {0}".format(response.status_code))
 
+def create_subfolder(workspace, subfolder_name, password):
+    response = requests.get("http://{0}/CreateSubFolder/{1}/{2}/{3}".format(address, workspace, password, subfolder_name))
+    if response.status_code == 401:
+        raise Exception("Incorrect password for workspace")
+    if response.status_code in [200, 201]:
+        return json.loads(response.text)
+    else:
+        raise Exception("Bad response code: {0}".format(response.status_code))
+
 def random_string_var(min, max):
     return random_string(random.randint(min, max))
 
