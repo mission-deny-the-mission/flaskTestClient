@@ -17,7 +17,7 @@ def upload_file(workspace, filename, password):
         raise Exception("bad status code: {0}".format(response.status_code))
 
 def make_workspace(password):
-    response = requests.get("http://{0}/register/{1}".format(address, password))
+    response = requests.post(url="http://{0}/register/".format(address), json={"password": password})
     if response.status_code == 401:
         raise Exception("Incorrect password for workspace")
     if response.status_code != 200:
@@ -25,14 +25,15 @@ def make_workspace(password):
     return response.text
 
 def delete_workspace(workspace, password):
-    response = requests.get("http://{0}/Delete/{1}/{2}".format(address, workspace, password))
+    response = requests.get("http://{0}/Delete/".format(address), json={"workspace": workspace, "password": password})
     if response.status_code == 401:
         raise Exception("Incorrect password for workspace")
     if response.status_code not in [200, 201]:
         raise Exception("Bad status code:{0}".format(response.status_code))
 
 def compile_file(function, workspace, input_filename, output_filename, password):
-    response = requests.get("http://{0}/{1}/{2}/{3}/{4}".format(address, function, workspace, password, input_filename))
+    data = {"workspace": workspace, "filename": input_filename, "password": password}
+    response = requests.post("http://{0}/{1}/".format(address, function), json=data)
     if response.status_code == 401:
         raise Exception("Incorrect password for workspace")
     if response.status_code in [200, 201]:
@@ -44,7 +45,7 @@ def compile_file(function, workspace, input_filename, output_filename, password)
         raise Exception("Bad response code: {0}".format(response.status_code))
 
 def list_dirs(dir, password):
-    response = requests.get("http://{0}/ListFiles/{1}/{2}".format(address, dir, password))
+    response = requests.get("http://{0}/ListFiles/".format(address), json={"workspace": dir, "password": password})
     if response.status_code == 401:
         raise Exception("Incorrect password for workspace")
     if response.status_code in [200, 201]:
@@ -53,7 +54,8 @@ def list_dirs(dir, password):
         raise Exception("Bad response code: {0}".format(response.status_code))
 
 def create_subfolder(workspace, subfolder_name, password):
-    response = requests.get("http://{0}/CreateSubFolder/{1}/{2}/{3}".format(address, workspace, password, subfolder_name))
+    data = {"workspace": workspace, "subfolder": subfolder_name, "password": password}
+    response = requests.get("http://{0}/CreateSubFolder/{1}/{2}/{3}".format(address), json=data)
     if response.status_code == 401:
         raise Exception("Incorrect password for workspace")
     if response.status_code in [200, 201]:
