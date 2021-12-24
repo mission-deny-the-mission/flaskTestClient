@@ -9,7 +9,10 @@ addressfile.close()
 
 def upload_file(workspace, filename, password):
     file = open(filename, 'rb')
-    response = requests.post("http://{0}/upload/{1}/{2}/{3}".format(address, workspace, password, filename), data=file)
+    params = {"workspace": workspace, "filename": filename, "password": password}
+    jstring = json.dumps(params)
+    files = {"json": jstring, filename: file}
+    response = requests.post("http://{0}/upload".format(address), files=files)
     file.close()
     if response.status_code == 401:
         raise Exception("Incorrect password for workspace")
